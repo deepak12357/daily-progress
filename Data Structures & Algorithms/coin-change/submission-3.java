@@ -1,30 +1,42 @@
 class Solution {
-    public int solve(String s, int n, int i, int[] dp){
-        if(i==n){
-            return 1;
-        }  
-        if(dp[i]!=0){
-            return dp[i];
-        }     
-        int temp = (int)s.charAt(i)- 48;
-        if(temp==0){ return 0;}
-        if(temp < 3 && i+1<n){
-            int temp2 = (int)s.charAt(i+1)- 48;
-            int num = temp*10+temp2;
-            if(num==10 || num == 20){
-                dp[i] = solve(s,n,i+2,dp);
-                return dp[i];
-            }
-            if(num<=26){
-                dp[i] = solve(s,n,i+1,dp)+solve(s,n,i+2,dp);
-                return dp[i];
-            }
+    public int solve(int[] coins,int n,int amount){
+        if(amount==0){
+            return 0;
         }
-        dp[i] = solve(s,n,i+1,dp);
-        return dp[i];
+        if(amount<0){
+            return Integer.MAX_VALUE;
+        }
+        int ans = Integer.MAX_VALUE;
+        for(int j=0;j<n;j++){
+            int temp = solve(coins,n,amount-coins[j]);
+            if(temp!=Integer.MAX_VALUE){
+                ans=Math.min(temp+1,ans);
+            }  
+        }
+        return ans;
     }
-    public int numDecodings(String s) {
-        int[] dp = new int[s.length()];
-        return solve(s,s.length(),0,dp);
+    public int coinChangeRec(int[] coins, int amount) {
+        int ans = solve(coins,coins.length,amount);
+        return ans == Integer.MAX_VALUE ? -1 : ans;
+    }
+    public int coinChange(int[] coins, int amount) {
+        int n = coins.length;
+        int[] dp = new int[amount+1];
+        
+        for(int i=0;i<=amount;i++){
+            dp[i]=Integer.MAX_VALUE;
+        }
+        dp[amount]=0;
+        for(int a=amount;a>=0;a--){
+            if(dp[a]!=Integer.MAX_VALUE)
+                for(int i=0;i<n;i++){
+                    int j = a-coins[i];
+                    if(j>=0){
+                        dp[j]=Math.min(dp[j],dp[a]+1);
+                    }
+                    
+                }
+        }
+        return dp[0] != Integer.MAX_VALUE ? dp[0] : -1;
     }
 }
